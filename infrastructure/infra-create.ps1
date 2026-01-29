@@ -7,7 +7,8 @@ $randomNumber = Get-Random -Minimum 10000 -Maximum 99999
 $resourceGroup = "flask-app-$randomNumber-rg"
 $appServicePlan = "flask-plan-$randomNumber"
 $webAppName = "flask-app-$randomNumber"
-$healthConfig = "{\""healthCheckPath\"":\""/healthz\""}"
+# $healthConfig = "{\""healthCheckPath\"":\""/healthz\""}"  # use in Windows PowerShell
+$healthConfig = '{"healthCheckPath":"/healthz"}'            # use in Azure Portal Shell with PowerShell
 
 Write-Host "Creating resource group: $resourceGroup"
 az group create --name $resourceGroup --location $location | Out-Null
