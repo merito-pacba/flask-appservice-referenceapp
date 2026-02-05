@@ -30,28 +30,61 @@ This is a project with reference Flask application. Projects includes script cre
 1. Start the app:
     - `python src/app.py`
 
-The app will be available at http://127.0.0.1:5000/ and the health check at http://127.0.0.1:5000/healthz.
+The app will be available at `http://127.0.0.1:5000/` and the health check at `http://127.0.0.1:5000/healthz` .
 
 ## Run the application in the Azure cloud
 
-1. In file `infrastructure/infra-create.sh`, change region (location) to one available to you.
+### Create AppService application
+
+Do it once, to create a new web application:
+
+1. In the file `infrastructure/infra-create.sh`, change region (location) to one available to you.
 1. In Azure portal open **Cloud Shell**. Verify if shell uses Bash. If it uses PowerShell - switch to Bash.
-1. Paste the content of `infrastructure/infra-create.sh` into **Cloud Shell**. Wait until script is completed. Verify if there is no error.
+1. Paste the content of `infrastructure/infra-create.sh` into **Cloud Shell**. Wait until script is completed. Verify if there is no error. Write down the name of the web application.
+
+### Configure Codespaces to deploy application to AppService
+
+Do it once, to configure your development environment:
+
 1. In VS Code (or Codespaces) install **Azure Tools** extension: press Ctrl-Shift-X, select **Azure Tools**, and click Install.
-1. In VS Code (Codespaces):
-   - Open **Azure** extension (A icon on the left sidebar, or press Ctrl-Shift-A).
-   - Sign in to Azure (if required).
-   - Expand *Azure for Students*, expand *AppService*, right click your application, select **Deploy to Web App...**.
+1. Open **Azure** extension (A icon on the left sidebar, or press Ctrl-Shift-A).
+1. Sign in to Azure (if required).
+1. Press Ctrl+Shift+P and type: `Preferences: Open Workspace Settings (JSON)`
+1. VSCode opens `.vscode/settings.json` file. If it does not exist, it will be created.
+1. Add the following content into file:
+
+   ```json
+   {
+     // Leave the old content of settings.json here
+
+     // Insert all options below:
+     // Include only application sources and depencencies
+     "appService.zipGlobPattern": "{src/**,requirements.txt}",
+
+     // Exclude folder and files that should not go to the cloud
+     "appService.zipIgnorePattern": [
+       "**/.git/**", "**/.vscode/**", "**/__pycache__/**", "**/*.pyc", "**/.venv/**", "**/.env"
+     ]
+   }
+   ```
+
+### Deploy your application to the Azure AppService
+
+Do it when you want to deploy new version to the cloud:
+
+1. In VS Code open **Azure** extension (A icon on the left sidebar, or press Ctrl-Shift-A).
+1. Sign in to Azure (if required).
+1. Expand *Azure for Students*, expand *AppService*, right click your application, select **Deploy to Web App...**.
 1. Wait until deployment is completed.
 1. Open Azure Portal. Open your application in App Services, select Overview, click Browse tab.
 
-The app will be available at https://flask-app-00000.azurewebsites.net/ (number will be diffrent).
+The app will be available at `https://flask-app-00000.azurewebsites.net/` (number will be diffrent).
 
 ## Notes
 
 1. As plans F1 and B1 are very slow, restarts often, and sleeps automatically, script configures web application as **Always on** (see: application > Settings > Configuration > General Settings tab > Always on).
 1. When you develop your application, you can switch to B2 plan for the moment to deploy application faster (AppService > AppService plan > Scale up). It makes a huge change!
-1. AppService > Configuration > Settings > Stack Settings tab > Startup Command explanation: 
+1. AppService > Configuration > Settings > Stack Settings tab > Startup Command explanation:
    1. Application is started by `gunicorn` web server and not `python` interpreter, because `gunicorn` automatically restarts application in case of failure - it is recommended way of running Python apps in production.
    1. `--bind=0.0.0.0:8000` : application uses port 8000 required by AppService, instead of default Flask port 5000.
    1. `src.app:app` : Flask application object named **app**, is located in **app.py** file inside **src** folder (`<folder>.<file>:<object>`).
