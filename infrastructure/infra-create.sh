@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 set -euo pipefail
 
-location="<available-region>"   # You can change this to your available Azure region
-sku="B1"                        # You can change this to your preferred App Service plan SKU, e.g. free tier "F1"
+location="<insert-your-azure-region-here>" # You can change this to your available Azure region
+sku="B1" # You can change this to your preferred App Service plan SKU, e.g. free tier "F1"
 
 random_number=$(shuf -i 10000-99999 -n 1)
 resource_group="flask-app-${random_number}-rg"
@@ -20,7 +20,7 @@ echo "Creating Web App: ${web_app_name}"
 az webapp create --name "${web_app_name}" --resource-group "${resource_group}" --plan "${app_service_plan}" --runtime "PYTHON:3.13"
 
 echo "Setting app setting APP_MESSAGE"
-az webapp config appsettings set --name "${web_app_name}" --resource-group "${resource_group}" --settings APP_MESSAGE="Hello from the Azure!"
+az webapp config appsettings set --name "${web_app_name}" --resource-group "${resource_group}" --settings APP_MESSAGE="Hello from the Azure!" SCM_DO_BUILD_DURING_DEPLOYMENT="true"
 
 echo "Configuring health check endpoint"
 az webapp config set --name "${web_app_name}" --resource-group "${resource_group}" --generic-configurations "${health_config}"
